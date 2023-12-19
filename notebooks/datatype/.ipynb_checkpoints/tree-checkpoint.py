@@ -70,6 +70,13 @@ class TreeNode():
         else:
             return self.children[index]
 
+    def __setitem__(self, index, item):
+        index = int(index)
+        if self.isLeaf:
+            self.children.append(item)
+        else:
+            self.children[index] = item
+
     @property
     def id(self):
         return self._id
@@ -154,17 +161,6 @@ class TreeNode():
 
     def view(self, depth: int = 0):
         pass
-
-
-def makeTree(node, G):
-    if node.isLeaf:
-        return G
-    else:
-        for c in node.children:
-            G.add_node(c.id)
-            G.add_edge(node.id, c.id)
-            G = makeTree(c, G)
-        return G
         
 
 class Tree():
@@ -172,33 +168,57 @@ class Tree():
         super().__init__(*args, **kwargs)
         self.node = node
         self.G = nx.DiGraph()
+        self.d = {node.id: node}
 
         if node:
-            self.G = self.makeTree(node)
+            self.G, self.d = self._makeTree(node, self.G, self.d)
 
-    def makeTree(self, node: TreeNode):
-        return makeTree(node, nx.DiGraph())
+    def _makeTree(self, node: TreeNode, G, d):
+        if node.isLeaf:
+            return G, d
+        else:
+            for c in node.children:
+                G.add_node(c.id)
+                G.add_edge(node.id, c.id)
+                d[c.id] = c
+                G, d = self._makeTree(c, G, d)
+            return (G, d)
 
-    def show(self, node: TreeNode | None = None):
-        G = self.makeTree(node) if node else self.G
+    def show(self, node: TreeNode|None = None, label: str = ""):
+        if node:
+            G, d = self._makeTree(node, nx.DiGraph(), {node.id: node})
+        else:
+            G, d = self.G, self.d
+        
         pos = nx.drawing.nx_agraph.graphviz_layout(G, prog="dot")
 
-        fig = plt.figure(figsize=(10, 10), dpi=300)
-        ax = fig.add_subplot(1, 1, 1)
+        #fig = plt.figure(figsize=(10, 10), dpi=300)
+        #ax = fig.add_subplot(1, 1, 1)
         
         nx.draw(
             G,
-            ax = ax,
+            #ax = ax,
             pos = pos,
             with_labels = False,
             arrows = False,
             node_size = 100,
             node_shape = 'o',
             width = 0.5,
-            #node_color = range(10),
-            #cmap = "jet",
         )
-        plt.show()
+
+        if label == "value":
+            labels = { key: value.value for key, value in d.items() }
+        else:
+            labels = { key: "" for key, valye in d.items() }
+
+        nx.draw_networkx_labels(
+            G,
+            pos = pos,
+            labels = labels,
+            font_size = 11,
+            font_color = "orange",
+        )
+            
 
 
            
