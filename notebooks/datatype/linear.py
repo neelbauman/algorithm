@@ -10,7 +10,7 @@ class queue(deque):
     def deque(self):
         return super().pop()
 
-    def empty(self):
+    def isEmpty(self):
         return True if len(self) == 0 else False
     
 class stack(deque):
@@ -23,5 +23,5 @@ class stack(deque):
     def pop(self):
         return super().pop()
 
-    def empty(self):
+    def isEmpty(self):
         return True if len(self) == 0 else False
