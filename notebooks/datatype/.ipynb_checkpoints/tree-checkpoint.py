@@ -70,6 +70,13 @@ class TreeNode():
         else:
             return self.children[index]
 
+    def __setitem__(self, index, item):
+        index = int(index)
+        if self.isLeaf:
+            self.children.append(item)
+        else:
+            self.children[index] = item
+
     @property
     def id(self):
         return self._id
@@ -152,19 +159,9 @@ class TreeNode():
         
         return self
 
-    def view(self, depth: int = 0):
-        pass
-
-
-def makeTree(node, G):
-    if node.isLeaf:
-        return G
-    else:
-        for c in node.children:
-            G.add_node(c.id)
-            G.add_edge(node.id, c.id)
-            G = makeTree(c, G)
-        return G
+    def view(self, label: str = "", depth: int = 0):
+        tree = Tree(self)
+        tree.show(label=label)
         
 
 class Tree():
@@ -172,33 +169,69 @@ class Tree():
         super().__init__(*args, **kwargs)
         self.node = node
         self.G = nx.DiGraph()
+        self.V = {node.id: node}
 
         if node:
-            self.G = self.makeTree(node)
+            self.G, self.V = self._makeTree(node)
 
-    def makeTree(self, node: TreeNode):
-        return makeTree(node, nx.DiGraph())
+    def _makeTree(
+        self,
+        node: TreeNode,
+        G: nx.DiGraph | None = None,
+        V: dict | None = None
+    ):
+        G = G if G is not None else self.G
+        V = V if V is not None else self.V
+        
+        if node.isLeaf:
+            return G, V
+        else:
+            for c in node.children:
+                G.add_node(c.id)
+                G.add_edge(node.id, c.id)
+                V[c.id] = c
+                G, V = self._makeTree(c, G, V)
+            return G, V
 
-    def show(self, node: TreeNode | None = None):
-        G = self.makeTree(node) if node else self.G
+    def show(
+        self,
+        node: TreeNode | None = None,
+        label: str = ""
+    ):
+        if node:
+            G, V = self._makeTree(node, nx.DiGraph(), {node.id: node})
+        else:
+            G, V = self.G, self.V
+        
         pos = nx.drawing.nx_agraph.graphviz_layout(G, prog="dot")
 
-        fig = plt.figure(figsize=(10, 10), dpi=300)
-        ax = fig.add_subplot(1, 1, 1)
+        #fig = plt.figure(figsize=(10, 10), dpi=300)
+        #ax = fig.add_subplot(1, 1, 1)
         
-        nx.draw(
+        nx.draw_networkx(
             G,
-            ax = ax,
+            #ax = ax,
             pos = pos,
             with_labels = False,
             arrows = False,
             node_size = 100,
             node_shape = 'o',
-            width = 0.5,
-            #node_color = range(10),
-            #cmap = "jet",
+            #node_color = "blue",
         )
-        plt.show()
+
+        if label == "value":
+            labels = { key: value.value for key, value in V.items() }
+        else:
+            labels = { key: "" for key, valye in V.items() }
+
+        nx.draw_networkx_labels(
+            G,
+            pos = pos,
+            labels = labels,
+            font_size = 10,
+            #font_color = "magenta",
+        )
+            
 
 
            
