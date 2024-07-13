@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ランキングイベントサポート</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .container {
+            width: 60%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .preview-container {
+            width: 60%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #333;
+            color: #fff;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .preview-container img {
+            width: 80%;
+            border-radius: 10px;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .button-container button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 0 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+        .yes-button {
+            background-color: #ff9900;
+            color: #fff;
+        }
+        .no-button {
+            background-color: #bbb;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ランキングイベントサポート</h1>
+        <form id="eventForm">
+            <div>
+                <img id="rankingImage" src="https://via.placeholder.com/300x100.png?text=ナイルの女帝" alt="ランキングタイトル画像">
+            </div>
+            <div>
+                <label for="rankingTitle">ランキングタイトル: </label>
+                <input type="text" id="rankingTitle" name="rankingTitle">
+            </div>
+            <div>
+                <label for="selectedTitle">選択したランキングタイトル: </label>
+                <select id="selectedTitle" name="selectedTitle">
+                    <option value="ナイルの女帝">ナイルの女帝</option>
+                    <!-- 追加のオプションを必要に応じて追加 -->
+                </select>
+            </div>
+            <div>
+                <label>制限ルール: </label>
+                <input type="checkbox" id="rule1" name="rule" value="合計コスト70以下"> 合計コスト70以下
+                <input type="checkbox" id="rule2" name="rule" value="バランス禁止"> バランス禁止
+                <!-- 追加のチェックボックスを必要に応じて追加 -->
+            </div>
+            <div>
+                <label for="eventPeriod">開催期間: </label>
+                <input type="text" id="eventPeriod" name="eventPeriod" placeholder="例: [06/30]23:59まで">
+            </div>
+            <div>
+                <label for="roomID">ルームID: </label>
+                <input type="text" id="roomID" name="roomID">
+            </div>
+        </form>
+    </div>
+
+    <div class="preview-container" id="preview">
+        <h2>プレビュー</h2>
+        <img src="https://via.placeholder.com/300x100.png?text=ナイルの女帝" alt="イベントバナー">
+        <p>クエスト: <span id="previewSelectedTitle">ナイルの女帝</span></p>
+        <p>制限ルール: <span id="previewRuleText">合計コスト70以下</span></p>
+        <p>開催期間: <span id="previewEventPeriod">[06/30]23:59まで</span></p>
+        <p>ルームID: <span id="previewRoomID">room2</span></p>
+        <div class="button-container">
+            <button class="no-button">いいえ</button>
+            <button class="yes-button">はい</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('selectedTitle').addEventListener('change', function() {
+            let selectedOption = this.options[this.selectedIndex];
+            let imageUrl = selectedOption.getAttribute('data-image');
+            document.getElementById('rankingImage').src = imageUrl;
+            document.getElementById('previewImage').src = imageUrl;
+            document.getElementById('previewSelectedTitle').innerText = selectedOption.value;
+        });
+
+        document.getElementById('eventForm').addEventListener('input', function() {
+            let selectedTitle = document.getElementById('selectedTitle').value;
+            let rules = [];
+            if (document.getElementById('rule1').checked) {
+                rules.push(document.getElementById('rule1').value);
+            }
+            if (document.getElementById('rule2').checked) {
+                rules.push(document.getElementById('rule2').value);
+            }
+            let ruleText = rules.join(', ');
+            let eventPeriod = document.getElementById('eventPeriod').value;
+            let roomID = document.getElementById('roomID').value;
+
+            document.getElementById('previewSelectedTitle').innerText = selectedTitle;
+            document.getElementById('previewRuleText').innerText = ruleText;
+            document.getElementById('previewEventPeriod').innerText = eventPeriod;
+            document.getElementById('previewRoomID').innerText = roomID;
+        });
+    </script>
+</body>
+</html>
